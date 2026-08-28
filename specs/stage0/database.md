@@ -1,35 +1,45 @@
 # SDD Stage 1: Component Scaffolding
 
-## Database Schema & Loading
+> Reference Repository: Armoyas/analytical-dashboard
+> New Repository: Armoyas/dashboard-analytic
+> Stage: Stage 1
 
-### 1. Schema Definition (`database/schema.sql`)
+## 1. Data Model Definitions
 
-- **`merchants` table**:
-  - `merchant_key` (TEXT, PRIMARY KEY): Unique identifier for each merchant.
-- **`sessions` table**:
-  - `session_key` (TEXT, PRIMARY KEY): Unique ID for each payment session.
-  - `merchant_key` (TEXT, NOT NULL, FOREIGN KEY references merchants): Link to the merchant.
-  - `amount` (INTEGER, NOT NULL): Transaction amount in IRR.
-  - `adjusted_fee` (INTEGER, NOT NULL): The adjusted fee.
-  - `session_status` (TEXT, NOT NULL): Status of the session (e.g., 'completed', 'failed').
-  - `created_at` (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP): Timestamp of session creation.
-- **`transactions` table**:
-  - A direct copy of the `sessions` table content.
+### 1.1 `merchants` Table
+- `merchant_key` (TEXT, PRIMARY KEY): Unique identifier for merchants.
 
-### 2. CSV Loading Mechanism (`backend/api/database/connection.py`)
+### 1.2 `sessions` Table
+- `session_key` (TEXT, PRIMARY KEY): Unique identifier for each payment session.
+- `merchant_key` (TEXT, NOT NULL, FOREIGN KEY references merchants): The merchant associated with the session.
+- `amount` (INTEGER, NOT NULL): Transaction amount in Iranian Rials (IRR).
+- `adjusted_fee` (INTEGER, NOT NULL): The adjusted fee.
+- `session_status` (TEXT, NOT NULL): Status of the session (e.g., 'completed', 'failed', 'pending').
+- `created_at` (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP): Timestamp of session creation.
 
+### 1.3 `transactions` Table
+- A direct copy of the `sessions` table for separate query access.
+
+## 2. Database Operations
+
+### 2.1 CSV Data Loading (`backend/api/database/connection.py`)
 - The `load_csv` function will parse the CSV file located at `DATA_FILE` (defaulting to `/app/data/sample_data.csv`).
-- It intelligently creates or appends data to the `merchants` and `sessions` tables.
-- DuckDB's `read_csv_auto` is used for schema inference.
+- It creates or appends to `merchants` and `sessions` tables.
+- Schemas are inferred using `read_csv_auto`.
 
-### 3. Data Model (`backend/api/models/schemas.py`)
+### 2.2 Schema Initialization (`database/schema.sql`)
+- Defines `merchants`, `sessions`, and `transactions` tables.
+- Includes indexes for `merchant_key`, `session_status`, and `created_at`.
 
-- **`Transaction` Pydantic Model**: Corresponds to the structure of rows in the `sessions` (and `transactions`) table.
-- **`MerchantSummary` Pydantic Model**: Represents the aggregated summary data for a merchant.
+## 3. API Integration
 
-### 4. Validation
+- **Merchants Router**: Endpoints to list merchants and retrieve merchant-specific summaries `/api/merchants`.
+- **Analytics Router**: Endpoints for global dashboard overview `/api/analytics/overview` and transaction listing `/api/transactions`.
+- **Sessions Router**: Endpoints for listing all sessions `/api/sessions` and retrieving specific session details.
+
+## 4. Validation Criteria
 
 - [x] Schema definition is valid SQL for DuckDB.
 - [x] `load_csv` function correctly identifies and parses the CSV structure.
 - [x] Primary and foreign key constraints are correctly defined.
-- [x] Indexes are created on `merchant_key`, `session_status`, and `created_at` for query optimization.
+- [x] Indexes are created for performance optimization.

@@ -6,7 +6,7 @@
 - **Frontend**: Vitest, React Testing Library.
 - **E2E**: Playwright.
 
-## Test Goals
+## Test Coverage Goals
 
 - **Unit Tests**: High coverage for core logic.
 - **Integration Tests**: Verify API endpoints and data flow.
