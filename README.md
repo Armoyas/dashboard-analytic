@@ -1,89 +1,73 @@
-# ZarrinPal Analytics Dashboard
+# SDD Stage 1: Component Scaffolding
 
-Analytical dashboard for ZarrinPal payment data, built using Spec-Driven Development (SDD) methodology.
+> Reference Repository: Armoyas/analytical-dashboard
+> New Repository: Armoyas/dashboard-analytic
+> Stage: Stage 1
 
-## Quick Start
+## 1. Overview
 
-```bash
-git clone https://github.com/Armoyas/dashboard-analytic.git
-cd dashboard-analytic
-docker compose build --no-cache
-docker compose up -d
-```
+This stage scaffolds the core components of the dashboard application. It includes:
+- Frontend components and pages using Next.js 15.1.3.
+- Backend API structure with FastAPI, DuckDB connection, and initial routes.
+- Docker Compose setup for local development and deployment.
+- Basic Nginx configuration.
+- Initial DuckDB schema definition and CSV data loading script.
 
-Access the dashboard at: http://localhost:3000/
+## 2. Deliverables
 
-## Architecture
+- **Frontend**:
+  - `frontend/package.json`, `next.config.js`, `tailwind.config.js`, `postcss.config.js`
+  - `frontend/app/layout.tsx`, `frontend/app/page.tsx`
+  - `frontend/app/dashboard/page.tsx` (dynamic route)
+  - `frontend/components/MerchantSelector.tsx`
+  - `frontend/components/AnalyticsChart.tsx`
+  - `frontend/components/DataTable.tsx`
+- **Backend**:
+  - `backend/requirements.txt`
+  - `backend/api/main.py` (FastAPI app setup)
+  - `backend/api/routers/*` (merchants, analytics, sessions)
+  - `backend/api/models/schemas.py` (Pydantic models)
+  - `backend/api/database/connection.py` (DuckDB connection & CSV loading)
+  - `backend/api/services/zarrinpal.py` (Data loading logic)
+- **Infrastructure**:
+  - `docker-compose.yml`
+  - `nginx/nginx.conf`
+  - `backend/Dockerfile`, `frontend/Dockerfile`
+  - `.env`, `.env.example`
+  - `.gitignore`
+- **Specs**:
+  - `specs/stage1/README.md`
+  - `specs/stage1/api-specs.md`
+  - `specs/stage1/components.md`
+  - `specs/stage1/database.md`
+  - `specs/stage1/deployment.md`
+  - `specs/stage1/testing.md`
+  - `specs/stage1/validation.md`
 
-```
-Client
-  ↓
-Nginx (port 80)
-  ↓
-Next.js (port 3000)   FastAPI (port 8000)
-  ↓
-DuckDB
-  ← data/sample_data.csv  (input CSV)
-```
+## 3. Execution Steps
 
-- **Frontend**: Next.js 15.1.3 with standalone build
-- **Backend**: FastAPI with uvicorn server
-- **Database**: DuckDB for analytical queries
-- **Data Source**: CSV input file (`data/sample_data.csv`) loaded into DuckDB on startup
-- **Infrastructure**: Docker Compose, Nginx reverse proxy
+1.  **Clone Reference Repos**: `Armoyas/analytical-dashboard` and `Armoyas/dashboard` (implicitly done via copying specs).
+2.  **Create `dashboard-analytic` repo**: Public repository created.
+3.  **Copy Specs & Data**: Stage 0 and Stage 1 specs, along with `data/` folder, copied.
+4.  **Install Speckit**: Via `lobe-skill-store` (assumed done).
+5.  **Run Stage 0**: Project definition, architecture, requirements, API contract, validation.
+6.  **Run Stage 1**: Scaffold frontend, backend, DuckDB schema, Docker Compose, Nginx config.
+7.  **Commit & Push**: All changes pushed to `Armoyas/dashboard-analytic`.
 
-## Data Source
+## 4. Validation (Stage 1 - Manual & Automated)
 
-The dashboard reads payment transaction data from a CSV file. By default it
-expects the file at `data/sample_data.csv` (mounted into the container at
-`/app/data/sample_data.csv`).
+- **Frontend**: Next.js 15.1.3 component imports, exports, and basic rendering verified. RTL support enabled.
+- **Backend**: FastAPI application imports and basic router structure validated. DuckDB connection and CSV loading logic implemented.
+- **Docker Compose**: Multi-container setup for API, Frontend, and Nginx confirmed. Volumes mounted for DuckDB and CSV data.
+- **Nginx**: Basic reverse proxy configuration for API and Frontend paths.
+- **Specs**: Stage 1 specification files created and available.
 
-| Column | Description |
-|--------|-------------|
-| `session_key` | Unique session/transaction ID |
-| `merchant_key` | Merchant identifier (e.g. `M1040`) |
-| `amount` | Payment amount in Iranian Rials (IRR) |
-| `adjusted_fee` | Fee indicator |
-| `session_status` | Status: `Verified`, `Failed`, `InBank`, etc. |
-| `created_at` | Timestamp of the payment attempt |
+## 5. Notes
 
-To use your own data, replace `data/sample_data.csv` with your ZarrinPal export
-or mount a different CSV via the `DATA_FILE` environment variable:
+- **CSV Data**: Assumes `data/sample_data.csv` is present and correctly formatted.
+- **DuckDB Schema**: `schema.sql` defines basic tables for merchants, sessions, and transactions.
+- **Next.js Configuration**: `force-dynamic` and `standalone` output enabled.
 
-```bash
-DATA_FILE=/app/data/your_data.csv docker compose up -d --build
-```
+## 6. Commit Message
 
-## Development
-
-### Frontend Development
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Backend Development
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn api.main:app --reload --port 8000
-```
-
-## Services
-
-| Service | Port | Description |
-|---------|------|-------------|
-| Nginx | 80 | Reverse proxy, load balancer |
-| Frontend | 3000 | Next.js application |
-| Backend | 8000 | FastAPI API server |
-| Adminer | 8080 | Database admin interface (optional) |
-
-## API Endpoints
-
-- `/api/health` - Health check
-- `/api/merchants` - List all merchants
-- `/api/analytics/overview` - Dashboard overview statistics
-- `/api/analytics/merchant/{merchant_key}` - Merchant-specific analytics
-- `/api/sessions` - List payment sessions
-- `/api/sessions/{session_id}` - Get specific session details
+`stage1: scaffold dashboard components and API structure`

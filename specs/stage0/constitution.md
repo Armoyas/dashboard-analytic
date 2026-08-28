@@ -1,83 +1,52 @@
-# Constitution
+# SDD Stage 1: Component Scaffolding
 
 > Reference Repository: Armoyas/analytical-dashboard
 > New Repository: Armoyas/dashboard-analytic
+> Stage: Stage 1
 
-## 1. Purpose
+## 1. Frontend Component Specifications
 
-This project implements a dashboard application using Spec-Driven Development (SDD). It is built upon the reference architecture established in the Armoyas/analytical-dashboard repository, with an explicit focus on specification-first development.
+### 1.1 `MerchantSelector` (`frontend/components/MerchantSelector.tsx`)
+- **Purpose**: Dropdown component to select a merchant for filtering.
+- **Props**: `merchants` (array of strings), `selected` (current selection), `onChange` (callback function).
+- **Functionality**: Renders a `<select>` element populated with merchant keys. Updates parent state via `onChange`.
 
-## 2. Scope
+### 1.2 `AnalyticsChart` (`frontend/components/AnalyticsChart.tsx`)
+- **Purpose**: Displays a bar chart of session status counts.
+- **Props**: `summary` (object containing `status_breakdown`).
+- **Libraries**: Uses `react-chartjs-2` and `chart.js`.
+- **Data Mapping**: Maps 'completed', 'failed', 'pending' statuses to chart segments.
 
-### In Scope
+### 1.3 `DataTable` (`frontend/components/DataTable.tsx`)
+- **Purpose**: Renders transaction data in a tabular format.
+- **Props**: `data` (array of transaction objects).
+- **Columns**: Displays `session_key`, `merchant_key`, `amount`, `adjusted_fee`, `session_status`, `created_at`.
+- **Styling**: Uses basic Tailwind CSS for table structure and readability.
 
-1. **Dashboard Application**
-   - FastAPI backend API providing analytics data
-   - Next.js frontend with React components
-   - DuckDB database with ZarrinPal analytics schema
-   - Nginx reverse proxy for routing
+## 2. Backend API Schema Definitions
 
-2. **Specification Artifacts**
-   - Stage 0 project definition and architecture specs
-   - Future stage specifications for detailed development
-   - API contract documentation
-   - Deployment and configuration guides
+### 2.1 Pydantic Models (`backend/api/models/schemas.py`)
+- **`Transaction`**: Defines schema for individual transaction records.
+- **`MerchantSummary`**: Defines schema for merchant summary data, including status breakdown.
 
-3. **Deployment**
-   - Docker Compose-based deployment
-   - Nginx reverse proxy configuration
-   - Integration with existing ZarrinPal analytics schema
+### 2.2 API Route Responses
+- **`GET /api/merchants`**: Returns `list[str]` (merchant keys).
+- **`GET /api/merchants/{merchant_key}/summary`**: Returns `MerchantSummary` object.
+- **`GET /api/analytics/overview`**: Returns `Dict[str, Any]` with global stats.
+- **`GET /api/transactions`**: Returns `Dict[str, Any]` containing a list of `Transaction` objects and pagination info.
+- **`GET /api/sessions`**: Returns `Dict[str, Any]` containing a list of sessions and pagination info.
 
-### Out of Scope
+## 3. Component Integration
 
-1. **Production Infrastructure Management**
-   - Server provisioning
-   - SSL certificate management
-   - Database administration beyond the dashboard
+- **`app/dashboard/page.tsx`**:
+  - Fetches merchants in `useEffect`.
+  - Fetches merchant summary and transactions based on `selectedMerchant`.
+  - Renders `MerchantSelector`, `AnalyticsChart`, and `DataTable` by passing props.
 
-2. **Business Intelligence Features**
-   - Advanced analytics modeling
-   - Machine learning pipelines
-   - Predictive analytics
+## 4. Component-level Validation
 
-3. **Authentication & Authorization**
-   - User management systems
-   - Role-based access control
-   - SSO integration
-
-## 3. Stakeholders
-
-| Role | Name | Responsibilities |
-|------|------|-----------------|
-| Product Owner | Armoyas | Define dashboard requirements and acceptance criteria |
-| Lead Developer | Armoyas | Implement the dashboard application following SDD methodology |
-| DevOps Engineer | Armoyas | Configure deployment environment (Docker, Nginx) |
-
-## 4. Principles
-
-1. **Spec-First Development**: All features must be defined in specifications before implementation.
-2. **Reference Architecture Compliance**: Follow patterns established in Armoyas/analytical-dashboard.
-3. **ZarrinPal Schema Compatibility**: Maintain compatibility with the merchant_key, session_status, amount schema.
-4. **Null-Safety**: All code must handle null/undefined values gracefully.
-5. **Docker-First**: All development and deployment must be containerized.
-6. **Version Pinning**: Major versions (Next.js, FastAPI) must be explicitly pinned.
-
-## 5. Success Criteria
-
-1. Dashboard application deployed successfully with Docker Compose
-2. API endpoints documented with OpenAPI specification
-3. Frontend renders analytics data correctly
-4. Nginx routing configured for both API and frontend
-5. Stage 0 specifications reviewed and approved
-6. All files committed to GitHub repository Armoyas/dashboard-analytic
-
-## 6. Definitions
-
-| Term | Definition |
-|------|-----------|
-| SDD | Spec-Driven Development - a methodology where all features are defined in specifications before implementation |
-| Stage 0 | Initial specification stage defining project identity, architecture, and high-level design |
-| ZarrinPal Schema | Data model for payment analytics with merchant_key, session_status, amount (Rials), and adjusted_fee fields |
-| Reference Repo | Armoyas/analytical-dashboard - the existing repository used as architectural reference |
-| Merchant Key | Unique identifier for a ZarrinPal merchant account |
-| Session Status | Status of a payment session (e.g., completed, failed, pending) |
+- [x] All component imports are correct.
+- [x] React hooks (`useState`, `useEffect`) used appropriately.
+- [x] Props are passed correctly between parent and child components.
+- [x] Basic error handling for API fetch failures (e.g., default values or empty states).
+- [x] Chart.js and DataTable rendering data as expected from API responses.
